@@ -23,3 +23,17 @@ function reduceNestedArray(arr: any[]): number {
 
 // Test
 console.log(reduceNestedArray([1, [1, 2, [4]]])); // Output: 8
+
+
+function printNumbers(): void {
+    let num = 1;
+    const interval = setInterval(() => {
+        console.log(num);
+        if (num === 5) {
+            clearInterval(interval);
+        }
+        num++;
+    }, 1000);
+}
+
+printNumbers();
