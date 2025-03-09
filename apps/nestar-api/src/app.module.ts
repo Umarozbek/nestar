@@ -17,9 +17,10 @@ import { DatabaseModule } from './database/database.module';
       autoSchemaFile: true,  
     }),
      ComponentsModule,
-     DatabaseModule,
-     ],
-  controllers: [AppController],
+     DatabaseModule,// TCP
+    //SOCKET => TCP  
+    ],  
+  controllers: [AppController], //REST API
   providers: [AppService, AppResolver],
 })
 export class AppModule {}
