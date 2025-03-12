@@ -1,84 +1,80 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { ObjectId } from "mongoose";
-import { MemberStatus, MemberType } from "../types/enums/member.enum";
-
-
+import { MemberAuthType, MemberStatus, MemberType } from "../types/enums/member.enum";
 
 @ObjectType()
 export class Member {
+ @Field(() => String)
+ _id: ObjectId;
 
-    @Field(()=> String)
-    _id: ObjectId;
+ @Field(() => MemberType)
+ memberType: MemberType;
 
+ @Field(() => MemberStatus)
+ memberStatus: MemberStatus;
 
-    @Field(()=> MemberType)
-    memberType:MemberType;
+ @Field(() => MemberAuthType)
+ memberAuthType: MemberAuthType;
 
-    
-    @Field(()=> MemberStatus)
-    memberStatus:MemberStatus;
+ @Field(() => String)
+ memberPhone: string;
 
-    @Field(()=> String)
-    memberPhone:string;
+ @Field(() => String)
+ memberNick: string;
 
-    @Field(()=> String)
-    memberNick:string;
+ memberPassword?: string;
 
-    memberPassword?: string;
+ @Field(() => String, { nullable: true })
+ memberFullName?: string;
 
-    @Field(() => String, {nullable: true})
-    memberFullName?:string;
+ @Field(() => String)
+ memberImage: string;
 
-    @Field(() => String)
-    memberImage:string;
+ @Field(() => String, { nullable: true })
+ memberAddress?: string;
 
+ @Field(() => String, { nullable: true })
+ memberDesc?: string;
 
-    @Field(() => String, {nullable: true})
-    memberAddress?:string;
+ @Field(() => Int)
+ memberProperties: number;
 
-    @Field(() => String, {nullable: true})
-    memberDesc?:string;
+ @Field(() => Int)
+ memberArticles: number;
 
-    @Field(()=> Int)
-    memberProperties: number;
+ @Field(() => Int)
+ memberFollowers: number;
 
-    @Field(()=> Int)
-    memberArticles: number;
+ @Field(() => Int)
+ memberFollowings: number;
 
-    @Field(()=> Int)
-    memberFollowers: number;
+ @Field(() => Int)
+ memberPoints: number;
 
-    @Field(()=> Int)
-    memberFollowings: number;
+ @Field(() => Int)
+ memberLikes: number;
 
-    @Field(()=> Int)
-    memberRank: number;
+ @Field(() => Int)
+ memberViews: number;
 
-    @Field(()=> Int)
-    memberPoints: number;
+ @Field(() => Int)
+ memberComments: number;
 
-    @Field(()=> Int)
-    memberLikes: number;
+ @Field(() => Int)
+ memberRank: number;
 
-    @Field(()=> Int)
-    memberViews: number;
+ @Field(() => Int)
+ memberWarnings: number;
 
-    @Field(()=> Int)
-    memberComments: number;
+ @Field(() => Int)
+ memberBlocks: number;
 
-    @Field(()=> Int)
-    memberWarnings: number;
+ @Field(() => Date, { nullable: true })
+ deletedAt?: Date;
 
-    @Field(()=> Int)
-    memberBlocks: number;
+ @Field(() => Date)
+ createdAt: Date;
 
-    @Field(()=> Date)
-    deletedAt?: Date;
-
-    @Field(()=> Date)
-    createdAt: Date;
-
-    @Field(()=> Date)
-    updatedAt: Date;
-
- }
+ @Field(() => Date)
+ updatedAt: Date;
+}
