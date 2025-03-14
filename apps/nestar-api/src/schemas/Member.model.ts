@@ -35,7 +35,7 @@ const MemberSchema = new Schema(
   
     memberPassword: {
      type: String,
-     select: false,
+     select: false, 
      required: true,
     },
   
