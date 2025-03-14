@@ -11,3 +11,4 @@ import MemberSchema from '../../schemas/Member.model';
   providers: [MemberResolver, MemberService] //schema model 
 })
 export class MemberModule {}
+ 
