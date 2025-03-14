@@ -47,3 +47,13 @@ function stringToKebab(str: string): string {
 
 // Test
 console.log(stringToKebab("I love Kebab")); // "i-love-kebab"
+
+
+
+function reverseInteger(num) {
+    // Raqamni stringga aylantiramiz, orqasiga o'giramiz va yana son holatiga qaytaramiz
+    return parseInt(num.toString().split('').reverse().join(''), 10);
+}
+
+// Test
+console.log(reverseInteger(123456789)); // 987654321
