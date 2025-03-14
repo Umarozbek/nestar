@@ -19,9 +19,9 @@ import { T } from './libs/types/common';
       autoSchemaFile: true,  
       formatError: (error: T) => {
         const graphQLFormattedError = {
-          code: error?.extension.code,
+          code: error?.extensions.code,
           message:
-          error?.etensions?.exception?.response?.message || error?.extensions?.response?.message || error?.message,
+          error?.extensions?.exception?.response?.message || error?.extensions?.response?.message || error?.message,
         };
         console.log("GRAPHQL GLOBAL ERROR", graphQLFormattedError);
         return graphQLFormattedError;
