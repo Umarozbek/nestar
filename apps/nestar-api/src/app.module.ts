@@ -11,12 +11,13 @@ import { T } from './libs/types/common';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(), 
-    GraphQLModule.forRoot({
-      driver:  ApolloDriver,
-      playground: true,
-      uploads: false,
+    ConfigModule.forRoot(), // inveromental variabllarni ishlatih uchun
+    GraphQLModule.forRoot({ // graph ql uchun 
+      driver:  ApolloDriver, // database
+      playground: true, // playground  
+      uploads: false, // file yuklamaydi
       autoSchemaFile: true,  
+      
       formatError: (error: T) => {
         const graphQLFormattedError = {
           code: error?.extensions.code,
@@ -27,11 +28,11 @@ import { T } from './libs/types/common';
         return graphQLFormattedError;
       },
     }),
-     ComponentsModule,
+     ComponentsModule, //HTTP
      DatabaseModule,// TCP
     //SOCKET => TCP  
     ],  
   controllers: [AppController], //REST API
-  providers: [AppService, AppResolver],
+  providers: [AppService, AppResolver], // GRAPHQL
 })
 export class AppModule {}
