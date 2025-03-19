@@ -56,4 +56,16 @@ function reverseInteger(num) {
 }
 
 // Test
-console.log(reverseInteger(123456789)); // 987654321
+console.log(reverseInteger(123456789)); // 987654321\\\
+
+
+function rotateArray(arr: number[], index: number): number[] {
+    if (index < 0 || index >= arr.length) {
+        throw new Error("Index out of bounds");
+    }
+    
+    return [...arr.slice(index + 1), ...arr.slice(0, index + 1)];
+}
+
+// Test case
+console.log(rotateArray([1, 2, 3, 4, 5, 6], 3)); // [5, 6, 1, 2, 3, 4]
