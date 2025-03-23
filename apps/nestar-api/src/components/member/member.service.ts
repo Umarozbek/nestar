@@ -7,6 +7,7 @@ import { MemberStatus } from '../../libs/types/enums/member.enum';
 import { Message } from '../../libs/types/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
+import { T } from '../../libs/types/common';
 
 
 @Injectable()
@@ -52,27 +53,37 @@ export class MemberService {
          return response;
     }
 
-    public async updateMember(memberId: ObjectId, input: MemberUpdate): Promise<string> {
+    /* UPDATE MEMBER */
+    public async updateMember(memberId: ObjectId, input: MemberUpdate): Promise<Member> {
         const result: Member = await this.memberModel
-        .findOneAndUpdate(
-            {
-            _id: memberId, 
-            memberStatus: MemberStatus.ACTIVE,
-        }, 
-        input,
-        { new:true } ,
-    )  
-        .exec();
-        if (!result) throw new InternalServerErrorException(Message.UPLOAD_FAILED);
+            .findOneAndUpdate(
+                {
+                    _id: memberId,
+                    memberStatus: MemberStatus.ACTIVE
+                }, 
+                    input, 
+                { neww: true },
+            )
+            .exec();
+        if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
-         result.accessToken = await this.authService.createToken(result);
-            return result;
-        
-        }
+        result.accessToken = await this.authService.createToken(result);
+        return result;
+    }
 
-        public async getMember(): Promise<string> {
-            return 'getMember executed !';
-        }
+        /* GET MEMBER */
+    public async getMember( targetId: ObjectId): Promise<Member> {
+        const search: T = {
+            _id: targetId,
+            memberStatus: {
+                $in: [ MemberStatus.ACTIVE, MemberStatus.BLOCK ],
+            },
+        };
+        const targetMember = await this.memberModel.findOne(search).lean().exec();
+        if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+       
+        return targetMember;
+    }
 
         public async getAllMembersByAdmin(): Promise<string> {
             return 'getAllMembersByAdmin executed !';

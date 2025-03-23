@@ -10,6 +10,8 @@ import { ObjectId } from 'mongoose';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
+import { shapeIntoMongoObjectId } from '../../libs/config';
+import { WithoutGuard } from '../auth/guards/without.guard';
 
 
 @Resolver()
@@ -65,11 +67,13 @@ export class MemberResolver {
           
 
 
-            @Query(() => String)
-            public async getMember(): Promise<string> {
-                console.log(" Query: getMember ");
-                return this.memberService.getMember();
-            
+       /* GET MEMBER */
+    @UseGuards(WithoutGuard)
+    @Query(() => Member)
+    public async getMember(@Args('memberId') input: string, @AuthMember('_id') memberId: ObjectId): Promise<Member> {
+        console.log('Query: getMember');
+        const targetId = shapeIntoMongoObjectId(input);
+        return await this.memberService.getMember(targetId);
     }
 
         /** ADMIN */
