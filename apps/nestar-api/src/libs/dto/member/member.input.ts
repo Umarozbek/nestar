@@ -3,7 +3,7 @@ import { IsIn, IsNotEmpty, IsOptional, Length, Min } from "class-validator";
 
 import { CronExpression } from "@nestjs/schedule";
 import { MemberAuthType, MemberStatus, MemberType } from "../../types/enums/member.enum";
-import { availableAgentSorts } from "../../config";
+import { availableAgentSorts, availableMembertSorts } from "../../config";
 import { Direction } from "../../types/enums/common.enum";
 
 
@@ -84,19 +84,45 @@ export class AgentsInquiry {
     search: AISearch;
 }
 
-// /* MEMBERS INQUIRY SEARCH || getAllMembersByAdmin */
-// @InputType()
-// class MISearch {
-//     @IsOptional()
-//     @Field(() => MemberStatus, { nullable: true })
-//     memberStatus?: MemberStatus;
+/* MEMBERS INQUIRY SEARCH || getAllMembersByAdmin */
+@InputType()
+class MISearch {
+    @IsOptional()
+    @Field(() => MemberStatus, { nullable: true })
+    memberStatus?: MemberStatus;
 
-//     @IsOptional()
-//     @Field(() => MemberType, { nullable: true })
-//     memberType?: MemberType;
+    @IsOptional()
+    @Field(() => MemberType, { nullable: true })
+    memberType?: MemberType;
 
-//     @IsOptional()
-//     @Field(() => String, { nullable: true })
-//     text?: string;
-// }
+    @IsOptional()
+    @Field(() => String, { nullable: true })
+    text?: string;
+}
 
+/* MEMBERS INQUIRY || getAllMembersByAdmin */
+@InputType()
+export class MembersInquiry {
+    @IsNotEmpty()
+    @Min(1)
+    @Field(() => Int)
+    page: number;
+
+    @IsNotEmpty()
+    @Min(1)
+    @Field(() => Int)
+    limit: number;
+
+    @IsOptional()
+    @IsIn(availableMembertSorts)
+    @Field(() => String, { nullable: true })
+    sort?: string;
+
+    @IsOptional()
+    @Field(() => Direction, { nullable: true })
+    direction?: Direction;
+
+    @IsNotEmpty()
+    @Field(() => MISearch)
+    search: MISearch;
+}

@@ -1,6 +1,6 @@
 import { Mutation,Resolver,Query, Args } from '@nestjs/graphql';
 import { MemberService } from './member.service';
-import { AgentsInquiry, LoginInput, MemberInput } from '../../libs/dto/member/member.input';
+import { AgentsInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
 import { Member, Members } from '../../libs/dto/member';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -22,7 +22,7 @@ export class MemberResolver {
         public async signup(@Args("input")input:MemberInput ): Promise<Member> {
             
                 console.log(" Mutation: signup ");
-                return this.memberService.signup(input);
+                return await this.memberService.signup(input);
            
         }
 
@@ -30,7 +30,7 @@ export class MemberResolver {
         public async login(@Args('input')input: LoginInput): Promise<Member>{
                        
             console.log("Mutation: Login");
-            return this.memberService.login(input);
+            return await this.memberService.login(input);
            }
       
 
@@ -39,7 +39,7 @@ export class MemberResolver {
            public async checkAuth(@AuthMember("memberNick") memberNick: string): Promise<string> {
                console.log(" Mutation: checkAuth ");
                console.log("memberNick", memberNick);
-               return `Hi ${memberNick}`;
+               return  `Hi ${memberNick}`;
        
           }
           @Roles(MemberType.USER, MemberType.AGENT)
@@ -47,7 +47,7 @@ export class MemberResolver {
           @Query(() => String)
           public async checkAuthRoles(@AuthMember() authMember: Member): Promise<string> {
               console.log(" Mutation: checkAuthRoles ");
-              return `Hi ${authMember.memberNick}, you are ${authMember.memberType} (memberId: ${authMember._id})`;
+              return  `Hi ${authMember.memberNick}, you are ${authMember.memberType} (memberId: ${authMember._id})`;
       
          }
 
@@ -60,7 +60,7 @@ export class MemberResolver {
     ): Promise<Member> {
         console.log('Mutation: updateMember');
         delete input._id;
-        return await this.memberService.updateMember(memberId, input);
+        return  this.memberService.updateMember(memberId, input);
     }
 
 
@@ -87,19 +87,23 @@ export class MemberResolver {
 
 
         /** ADMIN */
-        @Roles(MemberType.ADMIN)
-        @UseGuards(RolesGuard)
-        @Mutation(()=> String)
-        public async getAllMembersByAdmin(): Promise<string> {
-            return this.memberService.getAllMembersByAdmin();
-        }
 
-      // Authorization: Admin
-        @Mutation(() => String)
-        public async updateMemberByAdmin(): Promise<string> {
-            console.log(" Mutation: updateMemberByAdmin ");
-            return this.memberService.updateMemberByAdmin();
-    
-}
+     /* GET ALL MEMBERS BY ADMIN  Authorization: ADMIN */
+    @Roles(MemberType.ADMIN)
+    @UseGuards(RolesGuard)
+    @Query(() => Members)
+    public async getAllMembersByAdmin(@Args('input') input: MembersInquiry): Promise<Members> {
+        console.log('Query: getAllMembersByAdmin');
+        return await this.memberService.getAllMembersByAdmin(input);
+    }
 
+
+    /* UPDATE MEMBER BY ADMIN || Authorization: ADMIN */
+    @Roles(MemberType.ADMIN)
+    @UseGuards(RolesGuard)
+    @Mutation(() => Member)
+    public async updateMemberByAdmin(@Args('input') input: MemberUpdate): Promise<Member> {
+        console.log('Mutation: updateMemberByAdmin');
+        return await this.memberService.updateMemberByAdmin(input);
+    }
 }
