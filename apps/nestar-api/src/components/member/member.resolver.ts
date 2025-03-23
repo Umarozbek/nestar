@@ -9,6 +9,7 @@ import { MemberType } from '../../libs/types/enums/member.enum';
 import { ObjectId } from 'mongoose';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { MemberUpdate } from '../../libs/dto/member/member.update';
 
 
 @Resolver()
@@ -31,29 +32,37 @@ export class MemberResolver {
            }
       
 
-            @UseGuards(AuthGuard)
-            @Mutation(() => String)
-            public async updateMember(@AuthMember("_id") memberId: ObjectId): Promise<string> {
-                console.log(" Mutation: updateMember ");
-                return this.memberService.updateMember();
-           }
-
            @UseGuards(AuthGuard)
-            @Query(() => String)
-            public async checkAuth(@AuthMember("memberNick") memberNick: string): Promise<string> {
-                console.log(" Mutation: checkAuth ");
-                console.log("memberNick", memberNick);
-                return `Hi ${memberNick}`;
-        
-           }
-           @Roles(MemberType.USER, MemberType.AGENT)
-           @UseGuards(RolesGuard)
            @Query(() => String)
-           public async checkAuthRoles(@AuthMember() authMember: Member): Promise<string> {
-               console.log(" Mutation: checkAuthRoles ");
-               return `Hi ${authMember.memberNick}, you are ${authMember.memberType} (memberId: ${authMember._id})`;
+           public async checkAuth(@AuthMember("memberNick") memberNick: string): Promise<string> {
+               console.log(" Mutation: checkAuth ");
+               console.log("memberNick", memberNick);
+               return `Hi ${memberNick}`;
        
           }
+          @Roles(MemberType.USER, MemberType.AGENT)
+          @UseGuards(RolesGuard)
+          @Query(() => String)
+          public async checkAuthRoles(@AuthMember() authMember: Member): Promise<string> {
+              console.log(" Mutation: checkAuthRoles ");
+              return `Hi ${authMember.memberNick}, you are ${authMember.memberType} (memberId: ${authMember._id})`;
+      
+         }
+
+            /* UPDATE MEMBER */
+    @UseGuards(AuthGuard)
+    @Mutation(() => Member)
+    public async updateMember(
+        @Args('input') input: MemberUpdate,
+        @AuthMember('_id') memberId: ObjectId
+    ): Promise<Member> {
+        console.log('Mutation: updateMember');
+        delete input._id;
+        return await this.memberService.updateMember(memberId, input);
+    }
+
+
+          
 
 
             @Query(() => String)
