@@ -8,22 +8,30 @@ import { Message } from '../../libs/types/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { T } from '../../libs/types/common';
+import { ViewService } from '../view/view.service';
+import { ViewInput } from '../../libs/dto/view/view.input';
+import { ViewGroup } from '../../libs/types/enums/view.enum';
 
 
 @Injectable()
 export class MemberService {
+    constructor(@InjectModel('Member') private readonly memberModel: Model<Member>, 
+        private authService: AuthService,
+        private viewService: ViewService,
+    ) {}
 
-    constructor(@InjectModel('Member') private readonly memberModel: Model<Member>,
-     private authService:AuthService) {}
 
+    /* SIGN UP */
     public async signup(input: MemberInput): Promise<Member> {
-        input.memberPassword = await this.authService.hashPassword(input.memberPassword);
+            // TODO: Hashing password || passwordlarni hash qilish mantigi
+            input.memberPassword = await this.authService.hashPassword(input.memberPassword);
 
         try {
             const result = await this.memberModel.create(input);
-
+            
+            // TODO: Authentication via TOKEN
             result.accessToken = await this.authService.createToken(result);
-       
+            
             return result;   
         } catch (err) {
             console.log('Error, Service.model:', err.message);
@@ -31,12 +39,14 @@ export class MemberService {
         }
     }
 
+
+    /* LOG IN */
     public async login(input: LoginInput): Promise<Member> {
-        const { memberNick, memberPassword } = input; //distraction
+        const { memberNick, memberPassword } = input;
         const response: Member = await this.memberModel
-        .findOne({ memberNick: memberNick})
-        .select('+memberPassword')
-        .exec() as Member;
+            .findOne({ memberNick: memberNick })
+            .select('+memberPassword')
+            .exec();
 
             if (!response || response.memberStatus === MemberStatus.DELETE) {
                 throw new InternalServerErrorException(Message.NO_MEMBER_NICK);
@@ -44,14 +54,17 @@ export class MemberService {
                 throw new InternalServerErrorException(Message.BLOCKED_USER);
             }
 
-            // TODO: Compare passwords
-            
+                // TODO: Compare passwords
             const isMatch = await this.authService.comparePasswords(input.memberPassword, response.memberPassword);
             if (!isMatch) throw new InternalServerErrorException(Message.WRONG_PASSWORD);
+
+                // TODO: Authentication via TOKEN
             response.accessToken = await this.authService.createToken(response);
 
-         return response;
+
+        return response;
     }
+
 
     /* UPDATE MEMBER */
     public async updateMember(memberId: ObjectId, input: MemberUpdate): Promise<Member> {
@@ -71,8 +84,9 @@ export class MemberService {
         return result;
     }
 
-        /* GET MEMBER */
-    public async getMember( targetId: ObjectId): Promise<Member> {
+
+    /* GET MEMBER */
+    public async getMember(memberId: ObjectId, targetId: ObjectId): Promise<Member> {
         const search: T = {
             _id: targetId,
             memberStatus: {
@@ -81,14 +95,32 @@ export class MemberService {
         };
         const targetMember = await this.memberModel.findOne(search).lean().exec();
         if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-       
+        
+        if (memberId) {
+            // Record view
+            const viewInput: ViewInput = { memberId: memberId, viewRefId: targetId, viewGroup: ViewGroup.MEMBER };
+            const newView = await this.viewService.recordView(viewInput);
+            
+            // increase memberView 
+            if (newView) {
+                await this.memberModel.findOneAndUpdate(search, { $inc: { memberViews: 1 }}, { new: true }).exec();
+                targetMember.memberViews++;
+            }
+
+            // meLiked
+            // meFollowed
+        }
         return targetMember;
     }
 
+
+
+
+            // getAllMembersByAdmin
         public async getAllMembersByAdmin(): Promise<string> {
             return 'getAllMembersByAdmin executed !';
         }
-
+                //updateMemberByAdmin
         public async updateMemberByAdmin(): Promise<string> {
             return 'updateMemberByAdmin executed !';
         }
