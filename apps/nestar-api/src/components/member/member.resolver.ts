@@ -1,7 +1,7 @@
 import { Mutation,Resolver,Query, Args } from '@nestjs/graphql';
 import { MemberService } from './member.service';
-import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
-import { Member } from '../../libs/dto/member';
+import { AgentsInquiry, LoginInput, MemberInput } from '../../libs/dto/member/member.input';
+import { Member, Members } from '../../libs/dto/member';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
@@ -76,6 +76,15 @@ export class MemberResolver {
         const targetId = shapeIntoMongoObjectId(input);
         return await this.memberService.getMember(memberId ,targetId);
     }
+
+ /* GET AGENTS */
+ @UseGuards(WithoutGuard)
+ @Query(() => Members)
+ public async getAgents(@Args('input') input: AgentsInquiry, @AuthMember('_id') memberId: ObjectId): Promise<Members> {
+     console.log('Query: getAgents');
+     return await this.memberService.getAgents(memberId, input);
+ }
+
 
         /** ADMIN */
         @Roles(MemberType.ADMIN)

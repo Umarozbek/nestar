@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { Member } from '../../libs/dto/member';
-import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
-import { MemberStatus } from '../../libs/types/enums/member.enum';
-import { Message } from '../../libs/types/enums/common.enum';
+import { Member, Members } from '../../libs/dto/member';
+import { AgentsInquiry, LoginInput, MemberInput } from '../../libs/dto/member/member.input';
+import { MemberStatus, MemberType } from '../../libs/types/enums/member.enum';
+import { Direction, Message } from '../../libs/types/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { T } from '../../libs/types/common';
@@ -15,6 +15,7 @@ import { ViewGroup } from '../../libs/types/enums/view.enum';
 
 @Injectable()
 export class MemberService {
+    [x: string]: any;
     constructor(@InjectModel('Member') private readonly memberModel: Model<Member>, 
         private authService: AuthService,
         private viewService: ViewService,
@@ -101,18 +102,47 @@ export class MemberService {
             const viewInput: ViewInput = { memberId: memberId, viewRefId: targetId, viewGroup: ViewGroup.MEMBER };
             const newView = await this.viewService.recordView(viewInput);
             
-            // increase memberView 
-            if (newView) {
-                await this.memberModel.findOneAndUpdate(search, { $inc: { memberViews: 1 }}, { new: true }).exec();
-                targetMember.memberViews++;
+                // increase memberView 
+                if (newView) {
+                    await this.memberModel.findOneAndUpdate(search, { $inc: { memberViews: 1 }}, { new: true }).exec();
+                    targetMember.memberViews++;
+                }
+                //ME LIKED
+                //MEfOLLOWED
+            
             }
-
-            // meLiked
-            // meFollowed
+            return targetMember;
         }
-        return targetMember;
-    }
+        
 
+         /* GET AGENTS */
+    public async getAgents(memberId: ObjectId, input: AgentsInquiry): Promise<Members> {
+        const { text } = input.search;
+        const match: T = { memberType: MemberType.AGENT, memberStatus: MemberStatus.ACTIVE };
+        const sort: T = { [ input?.sort ?? 'createdAt' ]: input?.direction ?? Direction.DESC };
+        // const sort: T = { createdAt: -1 };
+
+        if (text) match.memberNick = { $regex: new RegExp(text, 'i') };
+        console.log('match:', match);
+
+        const result = await this.memberModel
+        .aggregate([
+            { $match: match },
+            { $sort: sort },
+            {
+                $facet: {
+                    list: [{ $skip: (input.page - 1)* input.limit }, { $limit: input.limit }],
+                    metaCounter: [{ $count: 'total' }],
+                },
+            },
+        ])
+        .exec();
+        if(!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+        return result[0];
+        // if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+        // return result[0];
+
+    }
 
 
 
