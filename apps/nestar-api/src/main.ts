@@ -2,12 +2,20 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { LoggingInterceptor } from './libs/interceptor/Logging.interceptor';
- // express va nest jsni umumiy birlashmasi 
+import { graphqlUploadExpress } from 'graphql-upload';
+import * as express from 'express';
+
+// express va nest jsni umumiy birlashmasi 
  
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new LoggingInterceptor());
+  app.enableCors({ origin: true, credentials: true});
+
+  app.use(graphqlUploadExpress({ maxFileSize: 15000000, maxFiles: 10}));
+  app.use('/uploads',express.static('./uploads'));
+
   await app.listen(process.env.PORT_API ?? 3000);
 }
 bootstrap();
