@@ -7,6 +7,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { UseGuards } from '@nestjs/common';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { ObjectId } from 'mongoose';
+import { Property } from '../../libs/dto/property/property';
 
 @Resolver()
 export class PropertyResolver {
@@ -19,8 +20,7 @@ export class PropertyResolver {
      public async createProperty(
         @Args('input') input:PropertyInput,
         @AuthMember("_id") memberId: ObjectId,
-        // property input emas property edi lekin ishlatolmadim
-    ): Promise<PropertyInput> {
+    ): Promise<Property> {
         console.log('Mutation: createProperty ');
         input.memberId = memberId;
 

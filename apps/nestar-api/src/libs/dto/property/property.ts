@@ -1,117 +1,78 @@
-import { Field, ObjectType } from "@nestjs/graphql";
-import { ObjectId, Schema } from "mongoose";
+import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { ObjectId } from "mongoose";
 import { PropertyLocation, PropertyStatus, PropertyType } from "../../types/enums/property.enum";
+@ObjectType()
+export class Property {
+  @Field(() => String)
+  _id: ObjectId;
 
-const PropertySchema = new Schema(
-	{
-		propertyType: {
-			type: String,
-			enum: PropertyType,
-			required: true,
-		},
+  @Field(() => PropertyType)
+  propertyType: PropertyType;
 
-		propertyStatus: {
-			type: String,
-			enum: PropertyStatus,
-			default: PropertyStatus.ACTIVE,
-		},
+  @Field(() => PropertyStatus)
+  propertyStatus: PropertyStatus;
 
-		propertyLocation: {
-			type: String,
-			enum: PropertyLocation,
-			required: true,
-		},
+  @Field(() => PropertyLocation)
+  propertyLocation: PropertyLocation;
 
-		propertyAddress: {
-			type: String,
-			required: true,
-		},
+  @Field(() => String)
+  propertyAddress: string;
 
-		propertyTitle: {
-			type: String,
-			required: true,
-		},
+  @Field(() => String)
+  propertyTitle: string;
 
-		propertyPrice: {
-			type: Number,
-			required: true,
-		},
+  @Field(() => Number)
+  propertyPrice: number;
 
-		propertySquare: {
-			type: Number,
-			required: true,
-		},
+  @Field(() => Number)
+  propertySquare: number;
 
-		propertyBeds: {
-			type: Number,
-			required: true,
-		},
+  @Field(() => Int)
+  propertyBeds: number;
 
-		propertyRooms: {
-			type: Number,
-			required: true,
-		},
+  @Field(() => Int)
+  propertyRooms: number;
 
-		propertyViews: {
-			type: Number,
-			default: 0,
-		},
+  @Field(() => Int)
+  propertyViews: number;
 
-		propertyLikes: {
-			type: Number,
-			default: 0,
-		},
+  @Field(() => Int)
+  propertyLikes: number;
 
-		propertyComments: {
-			type: Number,
-			default: 0,
-		},
+  @Field(() => Int)
+  propertyComments: number;
 
-		propertyRank: {
-			type: Number,
-			default: 0,
-		},
+  @Field(() => Int)
+  propertyRank: number;
 
-		propertyImages: {
-			type: [String],
-			required: true,
-		},
+  @Field(() => [String])
+  propertyImages: string[];
 
-		propertyDesc: {
-			type: String,
-		},
+  @Field(() => String, {nullable: true})
+  propertyDesc?: string;
 
-		propertyBarter: {
-			type: Boolean,
-			default: false,
-		},
+  @Field(() => Boolean)
+  propertyBarter: boolean;
 
-		propertyRent: {
-			type: Boolean,
-			default: false,
-		},
+  @Field(() => Boolean)
+  propertyRent: boolean;
 
-		memberId: {
-			type: Schema.Types.ObjectId,
-			required: true,
-			ref: 'Member',
-		},
+  @Field(() => String)
+  memberId: ObjectId;
 
-		soldAt: {
-			type: Date,
-		},
+  @Field(() => Date, {nullable: true})
+  soldAt?: Date;
 
-		deletedAt: {
-			type: Date,
-		},
+  @Field(() => Date, {nullable: true})
+  deletedAt?: Date;
 
-		constructedAt: {
-			type: Date,
-		},
-	},
-	{ timestamps: true, collection: 'properties' },
-);
+  @Field(() => Date, {nullable: true})
+  constructedAt?: Date;
 
-PropertySchema.index({ propertyType: 1, propertyLocation: 1, propertyTitle: 1, propertyPrice: 1 }, { unique: true });
+  @Field(() => Date)
+  createdAt: Date;
 
-export default PropertySchema;
+  @Field(() => Date)
+  updatedAt: Date;
+
+}

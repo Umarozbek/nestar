@@ -4,14 +4,14 @@ import { Model } from 'mongoose';
 import { Message } from '../../libs/types/enums/common.enum';
 import { PropertyInput } from '../../libs/dto/property/property.input';
 import { MemberService } from '../member/member.service';
+import { Property } from '../../libs/dto/property/property';
 
 @Injectable()
 export class PropertyService {
-    constructor(@InjectModel('Property') private readonly propertyModel: Model<PropertyInput>,
+    constructor(@InjectModel('Property') private readonly propertyModel: Model<Property>,
      private memberService: MemberService
     ) {}
- // property input emas property edi lekin ishlatolmadim
- public async createProperty(input: PropertyInput): Promise<PropertyInput> {
+ public async createProperty(input: PropertyInput): Promise<Property> {
 
       try {
                 const result = await this.propertyModel.create(input);  

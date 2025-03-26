@@ -181,14 +181,15 @@ export class MemberService {
     }
 
     // memberStatsEditor
-    public async memberStatsEditor(p0: { _id: Schema.Types.ObjectId; targetKey: string; modifier: number; }): Promise<Member> {
+    public async memberStatsEditor(input: { _id: Schema.Types.ObjectId; targetKey: string; modifier: number; }): Promise<Member> {
         console.log('executed');
       const {_id, targetKey, modifier} = input;
       return await this.memberModel
       .findOneAndUpdate
       (
-        _id,{$inc: {targetKey: modifier}}
-        ,{new: true}
+        _id,
+        {$inc: {[targetKey]: modifier}},
+        {new: true}
     )
         .exec();
 
