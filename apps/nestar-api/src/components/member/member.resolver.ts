@@ -16,6 +16,7 @@ import { Message } from '../../libs/types/enums/common.enum';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { createWriteStream } from 'fs';
 
+
 @Resolver()
 export class MemberResolver {
     constructor(private readonly memberService: MemberService) {}
@@ -38,7 +39,7 @@ export class MemberResolver {
 
 
     
-    /* checkAuth */
+    /* CHECK AUTH */
     @UseGuards(AuthGuard)
     @Query(() => String)
     public async checkAuth(@AuthMember('memberNick') memberNick: string): Promise<string> {
@@ -48,7 +49,7 @@ export class MemberResolver {
     }
 
 
-    /* checkAuthRoles */
+    /* checkAuthRoles  */
     @Roles(MemberType.USER, MemberType.AGENT)
     @UseGuards(RolesGuard)
     @Query(() => String)
@@ -58,7 +59,7 @@ export class MemberResolver {
     }
     
 
-    /* UpdateMember */
+    /* updateMembe */
     @UseGuards(AuthGuard)
     @Mutation(() => Member)
     public async updateMember(
@@ -71,7 +72,7 @@ export class MemberResolver {
     }
 
 
-    /* getMembeR */
+    /* getMember */
     @UseGuards(WithoutGuard)
     @Query(() => Member)
     public async getMember(@Args('memberId') input: string, @AuthMember('_id') memberId: ObjectId): Promise<Member> {
@@ -90,9 +91,9 @@ export class MemberResolver {
     }
 
 
-    /* ADMINS BUSINESS LOGIC */
+    /* admins */
 
-    /*  getAllMembersByAdmin */
+    /* getAllMembersByAdmin */
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
     @Query(() => Members)
@@ -102,7 +103,7 @@ export class MemberResolver {
     }
 
 
-    /* updateMemberByAdmin */
+    /*  updateMemberByAdmin */
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
     @Mutation(() => Member)
@@ -112,7 +113,7 @@ export class MemberResolver {
     }
 
 
-    /* imageUploader */
+    /* IMAGE UPLOADER */
     @UseGuards(AuthGuard)
     @Mutation((returns) => String)
     public async imageUploader(
@@ -142,7 +143,7 @@ export class MemberResolver {
     }
 
 
-    /* imagesUploader */
+    /* IMAGES UPLOADER */
     @UseGuards(AuthGuard)
     @Mutation((returns) => [String])
     public async imagesUploader(
