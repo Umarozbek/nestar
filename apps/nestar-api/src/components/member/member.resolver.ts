@@ -1,7 +1,7 @@
 import { Mutation,Resolver,Query, Args } from '@nestjs/graphql';
 import { MemberService } from './member.service';
 import { AgentsInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
-import { Member, Members } from '../../libs/dto/member';
+
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
@@ -15,6 +15,7 @@ import { WithoutGuard } from '../auth/guards/without.guard';
 import { Message } from '../../libs/types/enums/common.enum';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { createWriteStream } from 'fs';
+import { Member, Members } from '../../libs/dto/member/member';
 
 
 @Resolver()

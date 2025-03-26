@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId } from 'mongoose';
-import { Member, Members } from '../../libs/dto/member';
+import { Model, ObjectId, Schema } from 'mongoose';
+
 import { AgentsInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
 import { MemberStatus, MemberType } from '../../libs/types/enums/member.enum';
 import { Direction, Message } from '../../libs/types/enums/common.enum';
@@ -11,6 +11,7 @@ import { T } from '../../libs/types/common';
 import { ViewService } from '../view/view.service';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/types/enums/view.enum';
+import { Member, Members } from '../../libs/dto/member/member';
 
 
 @Injectable()
@@ -177,5 +178,19 @@ export class MemberService {
         .findOneAndUpdate({ _id: input._id }, input, { new: true }).exec();
         if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
         return result;
+    }
+
+    // memberStatsEditor
+    public async memberStatsEditor(p0: { _id: Schema.Types.ObjectId; targetKey: string; modifier: number; }): Promise<Member> {
+        console.log('executed');
+      const {_id, targetKey, modifier} = input;
+      return await this.memberModel
+      .findOneAndUpdate
+      (
+        _id,{$inc: {targetKey: modifier}}
+        ,{new: true}
+    )
+        .exec();
+
     }
 }

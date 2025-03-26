@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { PropertyResolver } from './property.resolver';
-import { PropertyService } from './property.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import PropertySchema from '../../schemas/Property.model';
 import { ViewModule } from '../view/view.module';
 import { AuthModule } from '../auth/auth.module';
+import { PropertyService } from './property.service';
+import { MemberModule } from '../member/member.module';
 
 @Module({
 
@@ -16,7 +17,8 @@ import { AuthModule } from '../auth/auth.module';
       }
     ]),
      AuthModule,
-     ViewModule
+     ViewModule,
+     MemberModule
   ],
 
   providers: [PropertyResolver, PropertyService]
