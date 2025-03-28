@@ -4,6 +4,7 @@ import { PropertyLocation, PropertyStatus, PropertyType } from '../libs/types/en
 
 const PropertySchema = new Schema(
 	{
+		
 		propertyType: {
 			type: String,
 			enum: PropertyType,
@@ -108,6 +109,7 @@ const PropertySchema = new Schema(
 		constructedAt: {
 			type: Date,
 		},
+		
 	},
 	{ timestamps: true, collection: 'properties' },
 );
