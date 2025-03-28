@@ -14,9 +14,9 @@ export class PropertyResolver {
      constructor(private readonly  propertyService: PropertyService) {}
     
 
-       @Roles(MemberType.USER, MemberType.AGENT)
-       @UseGuards(RolesGuard)
-     @Mutation(()=> String)
+       @Roles( MemberType.AGENT) // ROLE yani kim foydalana olishi 
+       @UseGuards(RolesGuard)  // roleni teksihsirib qoyadi
+     @Mutation(()=> Property)  // postmandagi listda koriinib 
      public async createProperty(
         @Args('input') input:PropertyInput,
         @AuthMember("_id") memberId: ObjectId,
