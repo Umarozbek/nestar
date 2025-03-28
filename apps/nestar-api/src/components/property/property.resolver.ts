@@ -1,13 +1,13 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PropertyService } from './property.service';
-import { PropertyInput } from '../../libs/dto/property/property.input';
+import { PropertiesInquiry, PropertyInput } from '../../libs/dto/property/property.input';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/types/enums/member.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UseGuards } from '@nestjs/common';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { ObjectId } from 'mongoose';
-import { Property } from '../../libs/dto/property/property';
+import { Properties, Property } from '../../libs/dto/property/property';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { PropertyUpdate } from './property.update';
@@ -16,7 +16,7 @@ import { PropertyUpdate } from './property.update';
 export class PropertyResolver {
     constructor(private readonly propertyService: PropertyService) {}
 
-    /* CREATE PROPERTY */
+    /* createProperty */
     @Roles(MemberType.AGENT)
     @UseGuards(RolesGuard)
     @Mutation(() => Property)
@@ -31,7 +31,7 @@ export class PropertyResolver {
     }
   
 
-    /* GET PROPERTY */
+    /* getProperty */
     @UseGuards(WithoutGuard)
     @Query((returns) => Property)
     public async getProperty(
@@ -42,17 +42,30 @@ export class PropertyResolver {
         const propertyId = shapeIntoMongoObjectId(input);
         return await this.propertyService.getProperty(memberId, propertyId);
     }
-    /* UPDATE PROPERTY */
-    @Roles(MemberType.AGENT)
-    @UseGuards(RolesGuard)
-    @Mutation((returns) => Property)
+    /* updateProperty */
+      @Roles(MemberType.AGENT)
+      @UseGuards(RolesGuard)
+      @Mutation((returns) => Property)
     public async updateProperty(
-        @Args('input') input: PropertyUpdate,
-        @AuthMember('_id') memberId: ObjectId,
+          @Args('input') input: PropertyUpdate,
+          @AuthMember('_id') memberId: ObjectId,
     ): Promise<Property> {
-        console.log('Mutation: updateProperty');
-        input._id = shapeIntoMongoObjectId(input._id);
-        return await this.propertyService.updateProperty(memberId, input);
-    }
-  }
+          console.log('Mutation: updateProperty');
+          input._id = shapeIntoMongoObjectId(input._id);
+          return await this.propertyService.updateProperty(memberId, input);
+      }
   
+
+
+  /* getPropertiesdeclaration */
+  @UseGuards(WithoutGuard)
+  @Query((returns) => Properties)
+  public async getProperties(
+      @Args('input') input: PropertiesInquiry,
+      @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Properties> {
+      console.log('Query: getProperties');
+      return await this.propertyService.getProperties(memberId, input);
+  }
+
+}
