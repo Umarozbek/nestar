@@ -10,7 +10,7 @@ import { ViewGroup } from '../../libs/types/enums/view.enum';
 import { PropertyStatus } from '../../libs/types/enums/property.enum';
 import { ViewService } from '../view/view.service';
 import { PropertyUpdate } from './property.update';
-import moment from 'moment';
+import * as moment from "moment";
 import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
 
 
@@ -23,7 +23,8 @@ export class PropertyService {
     ) {}
 
 
-    /* createProperty */
+                         /* createProperty */
+
     public async createProperty(input: PropertyInput): Promise<Property> {
         try {
             const result = await this.propertyModel.create(input);
@@ -43,7 +44,8 @@ export class PropertyService {
     }
 
 
-    /* getProperty */
+                              /* getProperty */
+
     public async getProperty(memberId: ObjectId, propertyId: ObjectId): Promise<Property> {
         const search: T = {
             _id: propertyId,
@@ -77,7 +79,8 @@ export class PropertyService {
             .exec();
     }
     
-    /* updateProperty  */
+                           /* updateProperty  */
+
     public async updateProperty(memberId: ObjectId, input: PropertyUpdate): Promise<Property> {
         let { propertyStatus, soldAt, deletedAt } = input;
         const search: T = {
@@ -108,7 +111,8 @@ export class PropertyService {
         return result;
     }
 
-    /* getProperties defination */
+                            /* getProperties defination */
+
     public async getProperties(memberId: ObjectId, input: PropertiesInquiry): Promise<Properties> {
         const match: T = { propertyStatus: PropertyStatus.ACTIVE };
         const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
@@ -142,7 +146,8 @@ export class PropertyService {
         return result[0];
     }
     
-       /* SHAPE MATCH QUERY */
+                           /* shapeMatchQuery */
+
        private shapeMatchQuery(match: T, input: PropertiesInquiry): void {
         const {
             memberId,
@@ -175,7 +180,8 @@ export class PropertyService {
         }
     }
 
- /* GET AGENT PROPERTIES */
+                             /* getAgentProperties */
+
  public async getAgentProperties(memberId: ObjectId, input: AgentPropertiesInquiry): Promise<Properties> {
     const { propertyStatus } = input.search;
     if (propertyStatus === PropertyStatus.DELETE) throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
@@ -267,6 +273,15 @@ public async getAllPropertiesByAdmin(input: AllPropertiesInquiry): Promise<Prope
                 modifier: -1,
             });
         }
+
+        return result;
+    }
+
+                             /* removePropertyByAdmin */
+    public async removePropertyByAdmin(propertyId: ObjectId): Promise<Property> {
+        const search: T = { _id: propertyId, propertyStatus: PropertyStatus.DELETE };
+        const result = await this.propertyModel.findOneAndDelete(search).exec();
+        if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
 
         return result;
     }
