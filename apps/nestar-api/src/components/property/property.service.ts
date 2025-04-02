@@ -67,17 +67,7 @@ export class PropertyService {
         targetProperty.memberData = await this.memberService.getMember(null, targetProperty.memberId);
         return targetProperty;
     }
-    // meni yolim xato  memberData kelmaganda memberData: import("c:/Users/1/Desktop/nestar/apps/nestar-api/src/libs/dto/member/member").Member; dan import boldi undan tashqari member data degan type qoshildi propery model.ts faylida birinchilikda
-    public async propertyStatsEditor(input: StatisticModifier): Promise<Property> {
-        const { _id, targetkey, modifier } = input;
-        return await this.propertyModel
-            .findByIdAndUpdate(
-                _id,
-                { $inc: { [targetkey]: modifier } },
-                { new: true },
-            )
-            .exec();
-    }
+ 
     
                            /* updateProperty  */
 
@@ -286,5 +276,16 @@ public async getAllPropertiesByAdmin(input: AllPropertiesInquiry): Promise<Prope
         return result;
     }
 
+       // meni yolim xato  memberData kelmaganda memberData: import("c:/Users/1/Desktop/nestar/apps/nestar-api/src/libs/dto/member/member").Member; dan import boldi undan tashqari member data degan type qoshildi propery model.ts faylida birinchilikda
+       public async propertyStatsEditor(input: StatisticModifier): Promise<Property> {
+        const { _id, targetkey, modifier } = input;
+        return await this.propertyModel
+            .findByIdAndUpdate(
+                _id,
+                { $inc: { [targetkey]: modifier } },
+                { new: true },
+            )
+            .exec();
+    }
 
     }
