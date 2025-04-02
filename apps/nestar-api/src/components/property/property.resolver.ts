@@ -16,11 +16,13 @@ import { PropertyUpdate } from './property.update';
 export class PropertyResolver {
     constructor(private readonly propertyService: PropertyService) {}
 
-    /* createProperty */
+                             /* createProperty */
+
     @Roles(MemberType.AGENT)
     @UseGuards(RolesGuard)
     @Mutation(() => Property)
     public async createProperty(
+      /// 25 26 qatorda GQL orqali kelgan yangi malumotlar oladi va foydalanuvchini idsiga shu malumotlarni ulaydi!
         @Args('input') input: PropertyInput, 
         @AuthMember('_id') memberId: ObjectId
     ): Promise<Property> {
@@ -31,7 +33,8 @@ export class PropertyResolver {
     }
   
 
-    /* getProperty */
+                               /* getProperty */
+
     @UseGuards(WithoutGuard)
     @Query((returns) => Property)
     public async getProperty(
@@ -42,7 +45,8 @@ export class PropertyResolver {
         const propertyId = shapeIntoMongoObjectId(input);
         return await this.propertyService.getProperty(memberId, propertyId);
     }
-    /* updateProperty */
+                          /* updateProperty */
+
       @Roles(MemberType.AGENT)
       @UseGuards(RolesGuard)
       @Mutation((returns) => Property)
@@ -57,7 +61,8 @@ export class PropertyResolver {
   
 
 
-  /* getPropertiesdeclaration */
+                             /* getProperties */
+
   @UseGuards(WithoutGuard)
   @Query((returns) => Properties)
   public async getProperties(
@@ -79,7 +84,7 @@ export class PropertyResolver {
         return await this.propertyService.getAgentProperties(memberId, input);
     }
     
-    //getAllPropertiesByAdmin
+                             //getAllPropertiesByAdmin
 
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
@@ -92,6 +97,7 @@ export class PropertyResolver {
         return await this.propertyService.getAllPropertiesByAdmin(input);
     }
 
+              //*  updatePropertyByAdmin ** \\       
 
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
@@ -101,6 +107,7 @@ export class PropertyResolver {
       input._id = shapeIntoMongoObjectId(input._id);
       return await this.propertyService.updatePropertyByAdmin(input);
     }
+                             // * removePropertyByAdmin **\\
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
     @Mutation((returns) => Property)
@@ -109,6 +116,5 @@ export class PropertyResolver {
         const propertyId = shapeIntoMongoObjectId(input);
         return await this.propertyService.removePropertyByAdmin(propertyId);
     }
-
 
 }

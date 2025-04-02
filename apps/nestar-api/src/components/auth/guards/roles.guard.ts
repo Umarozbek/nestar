@@ -3,6 +3,8 @@ import { Reflector } from '@nestjs/core';
 import { AuthService } from '../auth.service';
 import { Message } from 'apps/nestar-api/src/libs/types/enums/common.enum';
 
+//  ROLES GUARD asosiy vazufasi ruxsat berilgan rollarga kriish ruxsatini beradi JWT TOKEN ORQALI userni tekshiradi agar mos kelmasa xato qaytaradi
+
 @Injectable()
 export class RolesGuard implements CanActivate {
 	constructor(
@@ -25,7 +27,7 @@ export class RolesGuard implements CanActivate {
 				authMember = await this.authService.verifyToken(token),
 				hasRole = () => roles.indexOf(authMember.memberType) > -1,
 				hasPermission: boolean = hasRole();
-
+ 
 			if (!authMember || !hasPermission) throw new ForbiddenException(Message.ONLY_SPECIFIC_ROLES_ALLOWED);
 
 			console.log('memberNick[roles] =>', authMember.memberNick);
