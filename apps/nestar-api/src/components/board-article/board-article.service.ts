@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { BoardArticle, BoardArticles } from '../../libs/dto/board-article/board-article';
-import { Model, ObjectId, Schema } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { Model, ObjectId, Schema } from 'mongoose';
+import { BoardArticle, BoardArticles } from '../../libs/dto/board-article/board-article';
 import { MemberService } from '../member/member.service';
 import { ViewService } from '../view/view.service';
 import { AllBoardArticlesInquiry, BoardArticleInput, BoardArticlesInquiry } from '../../libs/dto/board-article/board-article.input';
+import { BoardArticleUpdate } from '../../libs/dto/board-article/board-article.update';
+import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
 import { Direction, Message } from '../../libs/types/enums/common.enum';
 import { BoardArticleStatus } from '../../libs/types/enums/board-article.enum';
 import { T } from '../../libs/types/common';
 import { ViewGroup } from '../../libs/types/enums/view.enum';
-import { BoardArticleUpdate } from '../../libs/dto/board-article/board-article.update';
-import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class BoardArticleService {

@@ -6,6 +6,7 @@ import { ViewModule } from '../view/view.module';
 import { AuthModule } from '../auth/auth.module';
 import { PropertyService } from './property.service';
 import { MemberModule } from '../member/member.module';
+import { BoardArticleModule } from '../board-article/board-article.module';
 
 @Module({
 

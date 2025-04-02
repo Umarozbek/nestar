@@ -7,20 +7,19 @@ import { AuthModule } from '../auth/auth.module';
 import { MemberModule } from '../member/member.module';
 import { ViewModule } from '../view/view.module';
 
-
 @Module({
     imports:[
         MongooseModule.forFeature([
             {
               name: "BoardArticle",
-              schema:BoardArticleSchema,
+              schema: BoardArticleSchema,
             }
         ]),
         AuthModule,
         MemberModule,
         ViewModule,
     ],
-  providers: [BoardArticleResolver, BoardArticleService],
-  exports: [BoardArticleModule],
+    providers: [BoardArticleResolver, BoardArticleService],
+    exports: [BoardArticleService], // ✅ TO‘G‘RI: Serviceni eksport qilish kerak
 })
 export class BoardArticleModule {}
