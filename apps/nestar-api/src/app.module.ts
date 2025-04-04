@@ -15,7 +15,7 @@ import { T } from './libs/types/common';
     GraphQLModule.forRoot({ // graph ql uchun 
       driver:  ApolloDriver, // database
       playground: true, // playground  
-      uploads: false, // file yuklamaydi
+      uploads: false, // file yuklamaydirs
       autoSchemaFile: true,  
       
       formatError: (error: T) => {
