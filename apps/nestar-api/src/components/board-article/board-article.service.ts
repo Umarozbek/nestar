@@ -54,18 +54,18 @@ export class BoardArticleService {
         const targetBoardArtcile: BoardArticle = await this.boardArticleModel.findOne(search).lean().exec();
         if (!targetBoardArtcile) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
-        // if (memberId) {
-        //     const viewInput = { memberId: memberId, viewRefId: articleId, viewGroup: ViewGroup.ARTICLE };
-        //     const newView = await this.viewService.recordView(viewInput);
-        //     if (newView) {
-        //         await this.boardArticleStatusEditor({ _id: articleId, targetkey: 'articleViews', modifier: 1 })
-        //         targetBoardArtcile.articleViews++;
-        //     }
+        if (memberId) {
+            const viewInput = { memberId: memberId, viewRefId: articleId, viewGroup: ViewGroup.ARTICLE };
+            const newView = await this.viewService.recordView(viewInput);
+            if (newView) {
+                await this.boardArticleStatusEditor({ _id: articleId, targetkey: 'articleViews', modifier: 1 })
+                targetBoardArtcile.articleViews++;
+            }
 
-        //     // meLiked
-        //     const likeInput = { memberId: memberId, likeRefId: articleId, likeGroup: LikeGroup.PROPERTY };
-        //     targetBoardArtcile.meLiked = await this.likeService.checkLikeExistence(likeInput);
-        // }
+            // meLiked
+              const likeInput = { memberId: memberId, likeRefId: articleId, likeGroup: LikeGroup.PROPERTY };
+            targetBoardArtcile.meLiked = await this.likeService.checkLikeExistence(likeInput);
+        }
 
         targetBoardArtcile.memberData = await this.memberService.getMember(null, targetBoardArtcile.memberId);
         return targetBoardArtcile;
@@ -154,7 +154,7 @@ export class BoardArticleService {
             likeGroup: LikeGroup.ARTICLE,
         };
 
-        // LIKE TOGGLE || -1, +1 || via Like modules
+        // LIKE TOGGLE 
         const modifier: number = await this.likeService.toggleLike(input);
         const result = await this.boardArticleStatusEditor({ 
             _id: likeRefId, 
@@ -168,7 +168,7 @@ export class BoardArticleService {
     }
 
 
-    /* ADMIN || faqat adminlar ishlataoladigan GraphQL API lari */
+    //ADMINLAR UCHUN
     /* GET ALL BOARD ARTICLES BY ADMIN */
     public async getAllBoardArticlesByAdmin(input: AllBoardArticlesInquiry): Promise<BoardArticles> {
         const { articleStatus, articleCategory } = input.search;
