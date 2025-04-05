@@ -9,19 +9,23 @@ import { BoardArticleUpdate } from '../../libs/dto/board-article/board-article.u
 import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
 import { Direction, Message } from '../../libs/types/enums/common.enum';
 import { BoardArticleStatus } from '../../libs/types/enums/board-article.enum';
-import { T } from '../../libs/types/common';
+import { StatisticModifier, T } from '../../libs/types/common';
 import { ViewGroup } from '../../libs/types/enums/view.enum';
+import { LikeInput } from '../../libs/dto/like/like.input';
+import { LikeGroup } from '../../libs/types/enums/like.enum';
+import { LikeService } from '../like/like.service';
 
 @Injectable()
 export class BoardArticleService {
-    constructor ( @InjectModel('BoardArticle') private readonly boardArticleModel: Model<BoardArticle>,
+    constructor ( @InjectModel('BoardArticle') 
+        private readonly boardArticleModel: Model<BoardArticle>,
         private readonly memberService: MemberService,
         private readonly viewService: ViewService,
+        private readonly likeService: LikeService,
     ) {}
 
 
-                               /* createBoardArticle */
-                               
+    /* CREATE BOARD ARTICLE */
     public async createBoardArticle(memberId: ObjectId, input: BoardArticleInput): Promise<BoardArticle> {
         input.memberId = memberId;
         try {
@@ -40,43 +44,37 @@ export class BoardArticleService {
     }
 
 
-                                /* getBoardArticle */
-
+    /* GET BOARD ARTCILE */
     public async getBoardArticle(memberId: ObjectId, articleId: ObjectId): Promise<BoardArticle> {
         const search: T = {
             _id: articleId,
             articleStatus: BoardArticleStatus.ACTIVE,
         };
 
-        const targetBoardArtcile: BoardArticle = await this.boardArticleModel
-        .findOne(search)
-        .lean()
-        .exec();
+        const targetBoardArtcile: BoardArticle = await this.boardArticleModel.findOne(search).lean().exec();
         if (!targetBoardArtcile) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
-        if (memberId) {
-            const viewInput = { memberId: memberId, viewRefId: articleId, viewGroup: ViewGroup.ARTICLE };
-            const newView = await this.viewService.recordView(viewInput);
-            if (newView) {
-                await this.boardArticleStatusEditor({ _id: articleId, targetKey: 'articleViews', modifier: 1 })
-                targetBoardArtcile.articleViews++;
-            }
+        // if (memberId) {
+        //     const viewInput = { memberId: memberId, viewRefId: articleId, viewGroup: ViewGroup.ARTICLE };
+        //     const newView = await this.viewService.recordView(viewInput);
+        //     if (newView) {
+        //         await this.boardArticleStatusEditor({ _id: articleId, targetkey: 'articleViews', modifier: 1 })
+        //         targetBoardArtcile.articleViews++;
+        //     }
 
-         
-           
-        }
+        //     // meLiked
+        //     const likeInput = { memberId: memberId, likeRefId: articleId, likeGroup: LikeGroup.PROPERTY };
+        //     targetBoardArtcile.meLiked = await this.likeService.checkLikeExistence(likeInput);
+        // }
 
         targetBoardArtcile.memberData = await this.memberService.getMember(null, targetBoardArtcile.memberId);
         return targetBoardArtcile;
     }
-    boardArticleStatusEditor(arg0: { _id: Schema.Types.ObjectId; targetKey: string; modifier: number; }) {
-        throw new Error('Method not implemented.');
-    }
 
 
-                             /* updateBoardArticle */
+    /* UPDATE BOARD ARTICLE */
     public async updateBoardArticle(memberId: ObjectId, input: BoardArticleUpdate): Promise<BoardArticle> {
-        const { _id, articleStatus } = input; //distraction
+        const { _id, articleStatus } = input;
 
         const result = await this.boardArticleModel
         .findOneAndUpdate({ _id: _id, memberId: memberId, articleStatus: BoardArticleStatus.ACTIVE }, input, {
@@ -98,7 +96,7 @@ export class BoardArticleService {
     }
 
 
-                                  /* getBoardArticles */
+    /* GET BOARD ARTCILES */
     public async getBoardArticles(memberId: ObjectId, input: BoardArticlesInquiry): Promise<BoardArticles> {
         const { articleCategory, text } = input.search;
         const match: T = { articleStatus: BoardArticleStatus.ACTIVE };
@@ -121,7 +119,8 @@ export class BoardArticleService {
                         { $skip: (input.page - 1) * input.limit },
                         { $limit: input.limit },
 
-        
+                        // meLiked
+                        //lookupAuthMemberLiked( memberId ),
 
                         lookupMember,
                         { $unwind: '$memberData' },
@@ -136,10 +135,41 @@ export class BoardArticleService {
 
         return result[0];
     }
- /* BU APILAR ADMINLAR UCHUN XIZMAT QILADI BOSHQA USER YOKI AGENT KIROLMAYDI */
 
-                           /*  getAllBoardArticlesByAdmin */
 
+    /* LIKE TARGET MEMBER */
+    public async likeTargetBoardArticle(memberId: ObjectId, likeRefId: ObjectId): Promise<BoardArticle> {
+        const target: BoardArticle = await this.boardArticleModel
+        .findOne({ 
+            _id: likeRefId, 
+            articleStatus: BoardArticleStatus.ACTIVE
+        })
+        .exec();
+        
+        if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+        const input: LikeInput = {
+            memberId: memberId,
+            likeRefId: likeRefId,
+            likeGroup: LikeGroup.ARTICLE,
+        };
+
+        // LIKE TOGGLE || -1, +1 || via Like modules
+        const modifier: number = await this.likeService.toggleLike(input);
+        const result = await this.boardArticleStatusEditor({ 
+            _id: likeRefId, 
+            targetkey: 'articleLikes', 
+            modifier: modifier,
+        });
+
+        if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+        
+        return result;
+    }
+
+
+    /* ADMIN || faqat adminlar ishlataoladigan GraphQL API lari */
+    /* GET ALL BOARD ARTICLES BY ADMIN */
     public async getAllBoardArticlesByAdmin(input: AllBoardArticlesInquiry): Promise<BoardArticles> {
         const { articleStatus, articleCategory } = input.search;
         const match: T = {};
@@ -172,7 +202,7 @@ export class BoardArticleService {
     }
 
 
-                           /* updateBoardArticleByAdmin */
+    /* UPDATE BOARD ARTICLE BY ADMIN */
     public async updateBoardArticleByAdmin(input: BoardArticleUpdate): Promise<BoardArticle> {
         const { _id, articleStatus } = input;
         
@@ -193,7 +223,7 @@ export class BoardArticleService {
     }
 
     
-                                 /* removeBoardArticleByAdmin */
+    /* REMOVE BOARD ARTICLE BY ADMIN */
     public async removeBoardArticleByAdmin(articleId: ObjectId): Promise<BoardArticle> {
         const search: T = { _id: articleId, articleStatus: BoardArticleStatus.DELETE };
         const result = await this.boardArticleModel.findOneAndDelete(search).exec();
@@ -203,5 +233,15 @@ export class BoardArticleService {
     }
 
 
-   
+    /* BOARD ARTICLE STATUS EDITOR */
+    public async boardArticleStatusEditor(input: StatisticModifier): Promise<BoardArticle> {
+        const { _id, targetkey, modifier } = input;
+        return await this.boardArticleModel
+        .findByIdAndUpdate(
+            _id,
+            { $inc: { [targetkey]: modifier } },
+            { new: true, },
+        )
+        .exec();
+    }
 }

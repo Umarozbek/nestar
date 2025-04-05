@@ -15,10 +15,10 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Resolver()
 export class BoardArticleResolver {
-     constructor(private readonly boardArticleService: BoardArticleService) {}
-     
-                       /* CREATE BOARD ARTICLE */
+    constructor ( private readonly boardArticleService: BoardArticleService ) {}
 
+
+    /* CREATE BOARD ARTICLE */
     @UseGuards(AuthGuard)
     @Mutation((returns) => BoardArticle)
     public async createBoardArticle(
@@ -30,8 +30,7 @@ export class BoardArticleResolver {
     }
 
 
-                     /* GET BOARD ARTICLE */
-
+    /* GET BOARD ARTICLE */
     @UseGuards(WithoutGuard)
     @Query((returns) => BoardArticle)
     public async getBoardArticle(
@@ -44,8 +43,7 @@ export class BoardArticleResolver {
     }
 
 
-                 /* UPDATE BOARD ARTICLE */
-
+    /* UPDATE BOARD ARTICLE */
     @UseGuards(AuthGuard)
     @Mutation(() => BoardArticle)
     public async updateBoardArticle(
@@ -58,10 +56,20 @@ export class BoardArticleResolver {
     }
 
 
+    /* LIKE TARGET BOARD ARTICLE */
+    @UseGuards(AuthGuard)
+    @Mutation(() => BoardArticle)
+    public async likeTargetBoardArticle(
+        @Args('articleId') input: string,
+        @AuthMember('_id') memberId: ObjectId,
+    ): Promise<BoardArticle> {
+        console.log('Mutation: likeTargetBoardArticle');
+        const likeRefId = shapeIntoMongoObjectId(input);
+        return await this.boardArticleService.likeTargetBoardArticle(memberId, likeRefId);
+    }
 
 
-                                   /* GET BOARD ARTICLES */
-
+    /* GET BOARD ARTICLES */
     @UseGuards(WithoutGuard)
     @Query((returns) => BoardArticles)
     public async getBoardArticles(
@@ -73,9 +81,8 @@ export class BoardArticleResolver {
     }
 
 
-    /* BU APILAR ADMINLAR UCHUN XIZMAT QILADI BOSHQA USER YOKI AGENT KIROLMAYDI */
-    
-                              /* getAllBoardArticlesByAdmin */
+    /* ADMIN || faqat adminlar ishlataoladigan GraphQL API lari */
+    /* GET ALL BOARD ARTICLES BY ADMIN */
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
     @Query((returns) => BoardArticles)
@@ -88,8 +95,7 @@ export class BoardArticleResolver {
     }
     
     
-                        /* updateBoardArticleByAdmin */
-
+    /* UPDATE BOARD ARTICLE BY ADMIN */
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
     @Mutation(() => BoardArticle)
@@ -103,8 +109,7 @@ export class BoardArticleResolver {
     }
 
 
-                     /* removeBoardArticleByAdmin */
-
+    /* REMOVE BOARD ARTICLE BY ADMIN */
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
     @Mutation((returns) => BoardArticle)

@@ -83,10 +83,10 @@ export class PropertyResolver {
         console.log('Query: getAgentProperties');
         return await this.propertyService.getAgentProperties(memberId, input);
     }
-    
+    //likeTargetProperty
      @UseGuards(WithoutGuard)
          @Mutation(() => Property)
-         public async likeTargetPrperty(
+         public async likeTargetProperty(
             @Args('propertyId') input: string,
             @AuthMember('_id') memberId: ObjectId,
          ): Promise<Property> {

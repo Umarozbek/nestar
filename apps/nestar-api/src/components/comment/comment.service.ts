@@ -46,7 +46,7 @@ export class CommentService {
             case CommentGroup.ARTICLE:
                 await this.boardArticleService.boardArticleStatusEditor({
                     _id: input.commentRefId,
-                    targetKey: 'articleComments',
+                    targetkey: 'articleComments',
                     modifier: 1,
                 });
             break;

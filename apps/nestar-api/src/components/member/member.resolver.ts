@@ -91,7 +91,7 @@ export class MemberResolver {
     }
 
      //LIKE 
-     @UseGuards(WithoutGuard)
+     @UseGuards(AuthGuard)
      @Mutation(() => Member)
      public async likeTargetMember(
         @Args('memberId') input: string,
@@ -103,7 +103,7 @@ export class MemberResolver {
      }
 
     /* admins */
-
+ 
     /* getAllMembersByAdmin */
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
