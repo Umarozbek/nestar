@@ -7,6 +7,7 @@ import { AuthModule } from '../auth/auth.module';
 import { PropertyService } from './property.service';
 import { MemberModule } from '../member/member.module';
 import { BoardArticleModule } from '../board-article/board-article.module';
+import { LikeModule } from '../like/like.module';
 
 @Module({
 
@@ -19,7 +20,8 @@ import { BoardArticleModule } from '../board-article/board-article.module';
     ]),
      AuthModule,
      ViewModule,
-     MemberModule
+     MemberModule,
+     LikeModule
   ],
 
   providers: [PropertyResolver, PropertyService],

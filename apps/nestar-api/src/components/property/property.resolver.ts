@@ -72,7 +72,7 @@ export class PropertyResolver {
       console.log('Query: getProperties');
       return await this.propertyService.getProperties(memberId, input);
   }
-
+                                    //getAgentProperties
  @Roles(MemberType.AGENT)
     @UseGuards(RolesGuard)
     @Query((returns) => Properties)
@@ -83,6 +83,17 @@ export class PropertyResolver {
         console.log('Query: getAgentProperties');
         return await this.propertyService.getAgentProperties(memberId, input);
     }
+    
+     @UseGuards(WithoutGuard)
+         @Mutation(() => Property)
+         public async likeTargetPrperty(
+            @Args('propertyId') input: string,
+            @AuthMember('_id') memberId: ObjectId,
+         ): Promise<Property> {
+            console.log('Mutation: likeTargetPrperty');
+            const likeRefId = shapeIntoMongoObjectId(memberId);
+            return await this.propertyService.likeTargetProperty(memberId, likeRefId);
+         }
     
                              //getAllPropertiesByAdmin
 
