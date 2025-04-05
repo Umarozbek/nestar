@@ -1,9 +1,8 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId, Schema } from 'mongoose';
-
 import { AgentsInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
-import { MemberStatus, MemberType } from '../../libs/types/enums/member.enum';
+import {  MemberStatus, MemberType } from '../../libs/types/enums/member.enum';
 import { Direction, Message } from '../../libs/types/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
@@ -12,6 +11,9 @@ import { ViewService } from '../view/view.service';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/types/enums/view.enum';
 import { Member, Members } from '../../libs/dto/member/member';
+import { LikeGroup } from '../../libs/types/enums/like.enum';
+import { LikeInput } from '../../libs/dto/like/like.input';
+import { LikeService } from '../like/like.service';
 
 
 @Injectable()
@@ -20,6 +22,7 @@ export class MemberService {
         @InjectModel('Member') private readonly memberModel: Model<Member>, 
         private authService: AuthService,
         private viewService: ViewService,
+        private likeService: LikeService,
     ) {}
 
 
@@ -141,6 +144,25 @@ export class MemberService {
         return result[0];
     }
 
+                                /* LIKETARGET API */
+    
+    public async likeTargetMember(memberId: ObjectId, likeRefId: ObjectId): Promise<Member>{
+        const target: Member = await this.memberModel.findOne({_id: likeRefId, memberStatus:MemberStatus.ACTIVE}).exec();
+      if(!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+        const  input: LikeInput = {
+            memberId: memberId,
+            likeRefId: likeRefId,
+            likeGroup: LikeGroup.MEMBER
+        };
+
+        //LIKE TOGLLE like modules
+        const modifier: number = await this.likeService.toggleLike(input);
+        const result = await this.memberStatsEditor({_id: likeRefId, targetKey: 'memberLikes', modifier});
+
+        if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+        return result;
+    }
 
     /* GET ALL MEMBERS BY ADMIN */
     public async getAllMembersByAdmin(input: MembersInquiry): Promise<Members> {
