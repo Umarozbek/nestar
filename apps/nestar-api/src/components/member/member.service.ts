@@ -14,12 +14,14 @@ import { Member, Members } from '../../libs/dto/member/member';
 import { LikeGroup } from '../../libs/types/enums/like.enum';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeService } from '../like/like.service';
+import { Follower, Following, MeFollowed } from '../../libs/dto/follow/follow';
 
 
 @Injectable()
 export class MemberService {
     constructor(
         @InjectModel('Member') private readonly memberModel: Model<Member>, 
+        @InjectModel('Follow') private readonly followModel: Model<Follower | Following>, 
         private authService: AuthService,
         private viewService: ViewService,
         private likeService: LikeService,
@@ -117,8 +119,15 @@ export class MemberService {
              const likeInput = { memberId: memberId, likeRefId: targetId, likeGroup: LikeGroup.MEMBER };
              targetMember.meLiked = await this.likeService.checkLikeExistence(likeInput);
             // meFollowed
+            targetMember.meFollowed = await this.checkSubscription(memberId, targetId);
         }
+
+        
         return targetMember;
+    }
+    private async checkSubscription(followerId: ObjectId, followingId: ObjectId): Promise<MeFollowed[]> {
+        const result = await this.followModel.findOne({ followerId: followerId, followingId: followingId }).exec();
+        return result ? [{ followerId: followerId, followingId: followingId, myFollowing: true }] : [];
     }
 
     /* GET AGENTS */
@@ -204,7 +213,8 @@ export class MemberService {
         if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
         return result;
     }
-
+  
+    
     // memberStatsEditor
     public async memberStatsEditor(input: { _id: Schema.Types.ObjectId; targetKey: string; modifier: number; }): Promise<Member> {
         console.log('executed');
