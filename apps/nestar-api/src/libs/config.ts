@@ -144,3 +144,13 @@ export const lookupFavorite = {
 		as: 'favoriteProperty.memberData',
 	},
 };
+
+        /*  lookupVisted  */ 
+		export const lookupVisit = {
+			$lookup: {
+				from: 'members',
+				localField: 'visitedProperty.memberId',
+				foreignField: '_id',
+				as: 'visitedProperty.memberData',
+			},
+		};
