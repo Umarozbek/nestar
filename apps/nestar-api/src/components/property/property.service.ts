@@ -11,7 +11,7 @@ import { PropertyStatus } from '../../libs/types/enums/property.enum';
 import { ViewService } from '../view/view.service';
 import { PropertyUpdate } from './property.update';
 import * as moment from "moment";
-import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
+import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
 import { LikeService } from '../like/like.service';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/types/enums/like.enum';
@@ -129,8 +129,7 @@ export class PropertyService {
                         { $skip: (input.page - 1) * input.limit },
                         { $limit: input.limit },
 
-                        // meLiked
-
+                        lookupAuthMemberLiked(memberId, "$_id"),
                         lookupMember,
                         { $unwind: '$memberData' },
                     ],
