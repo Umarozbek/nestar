@@ -7,6 +7,7 @@ import { T } from '../../libs/types/common';
 import { Properties } from '../../libs/dto/property/property';
 import { OrdinaryInquiry } from '../../libs/dto/property/property.input';
 import { ViewGroup } from '../../libs/types/enums/view.enum';
+import { lookupVisit } from '../../libs/config';
 
 @Injectable()
 export class ViewService {
